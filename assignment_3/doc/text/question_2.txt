@@ -1,0 +1,12 @@
+a
+"[ROOT,parsed]","[a,sentence]","parsed -> today","Left-Arc"
+"[ROOT,parsed,a]","[sentence]",".","shift"
+"[ROOT,parsed]","[sentence]","parsed -> a","Right-Arc"
+"[ROOT,parsed,shift]","[]",".","shift"
+"[ROOT,parsed]","[]","parsed -> sentence","Right-Arc"
+
+b
+A sentence will n words, will take 2n steps, as every word needs to be first shifted, then has to have a dependency created for it.
+
+
+

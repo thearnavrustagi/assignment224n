@@ -1,0 +1,91 @@
+\documentclass[11pt]{article}
+
+\usepackage{sectsty}
+\usepackage{graphicx}
+
+% Margins
+\topmargin=-0.45in
+\evensidemargin=0in
+\oddsidemargin=0in
+\textwidth=6.5in
+\textheight=9.0in
+\headsep=0.25in
+
+\title{ Title}
+\author{ Author }
+\date{\today}
+
+\begin{document}
+\maketitle	
+\pagebreak
+
+% Optional TOC
+% \tableofcontents
+% \pagebreak
+
+%--Paper--
+
+\section {Theory}
+\subsection{Question A}
+$$- y \times log(\hat y) - (1-y) \times log(1-\hat y) = -log\ P(O=o | C=c)$$
+where $y$ is the probability of getting $o$ after $c$.\\
+this as you can see is cross entropy loss, thats because, we already know that $y = 1$, and $\hat y$ is the predicted value of the probability of gettin $o$. so the naive softmax loss is just a simplified version of the cross entropy loss
+
+\subsection {Question B}
+so
+$$J(v_c) = - log P (v_c)$$
+$$P(v_c) = softmax(x_i)$$
+$$x_i = u_i*v_c$$
+so differentiating
+$$\frac {\partial J} {\partial v_c} = \frac {\partial J} {\partial P} \times \frac{\partial P} {x_o} \times \frac {\partial x_o} {v_c}$$
+so we get
+$$ \frac{\partial J} {\partial v_c} = \frac 1 {P(v_c)} \times softmax_i \cdot (1\{i=j\} - softmax_j) \times u_o^T$$
+now using the shape convention
+$u_o^T$ should be transposed again, thus the answer is
+$$ \frac{\partial J} {\partial v_c} = \bigg(\frac 1 {P(v_c)} \times softmax_i \cdot (1\{i=j\} - softmax_j)\bigg) \odot u_o$$
+
+
+\subsection {Question C}
+$$J(v_c) = - log P (v_c)$$
+$$P(v_c) = softmax(x_i)$$
+$$x_i = u_w * v_c$$
+so for some $u_w$
+where $w = o$
+differentiating
+as in this case the softmax function only has $u_w$ in its denominator and numerator, this case is similar to the previous case
+$$\frac {\partial J} {\partial u_w} = \frac {\partial J} {\partial P} \times \frac{\partial P} {x_o} \times \frac {\partial x_o} {u_w}$$
+$$ \frac{\partial J} {\partial u_w} = \frac 1 {P(v_c)} \times softmax_i \cdot (1\{i=j\} - softmax_j) \times v_c$$
+$$ \frac{\partial J} {\partial v_c} = \bigg(\frac 1 {P(v_c)} \times softmax_i \cdot (1\{i=j\} - softmax_j)\bigg) \odot v_c$$
+.\\\\
+now for the case where $w \ne o$
+in this case the softmax has $u_w$ in the denominator
+$$\frac {\partial J} {\partial u_w} = \frac {\partial J} {\partial P} \times \frac{\partial P} {x_o} \times \frac {\partial x_o} {u_w}$$
+$$ \frac{\partial J} {\partial u_w} = \frac 1 {P(v_c)} \times -\frac 1 {\sum_j exp(x_j)}\times softmax_i   \times v_c^T$$
+
+\subsection {Question D}
+\subsection {Question E}
+$$f(x) = max(0,x)$$
+so for $x > 0$
+$$f'(x) = \frac {dx} {dx} = 1$$
+and for $x < 0$
+$$f'(x) =\frac{d0}{dx} = 0$$
+
+\subsection {Question F}
+$$\sigma(x) = \frac {e^x} {1 + e^x}$$
+using product rule
+$$\frac {d\sigma(x)}{dx} = e^x \times \frac d {dx} \frac 1 {1 + e^x} + \frac 1 {1 + e^x} \times \frac {d}{dx} e^x$$
+$$\frac {d\sigma(x)}{dx} = e^x \times \frac d {dx} (1 + e^x)^- + \frac 1 {1 + e^x} \times e^x$$
+$$\frac {d\sigma(x)}{dx}\sigma(x) = e^x \times \frac 1 {-(1 + e^x)^{2}} \times e^x + \frac {e^x} {1 + e^x}$$
+$$\frac {d\sigma(x)}{dx} = -\bigg( \frac {e^x} {1 + e^x} \bigg)^2 + \frac {e^x} {1 + e^x}$$
+$$\frac {d\sigma(x)}{dx} = \sigma(x) - \sigma(x)^2$$
+$$\frac {d\sigma(x)}{dx} = \sigma(x)(1 - \sigma(x))$$
+
+\subsection {Question G}
+\subsection {Question H}
+\subsection {Question I}
+
+
+
+%--/Paper--
+
+\end{document}
