@@ -168,7 +168,42 @@ class CharCorruptionDataset(Dataset):
 
     def __getitem__(self, idx):
         # TODO [part e]: see spec above
-        raise NotImplementedError
+        # 0. Use the idx argument of __getitem__ to retrieve the element of self.data
+        # at the given index. We'll call the resulting data entry a document.
+        document = self.data[idx]
+        # Randomly truncate the document to a length no less than 4 characters,
+        # and no more than int(self.block_size*7/8) characters.
+        document = document[:random.randint(4, int(self.block_size * 7 / 8))]
+
+        # 2. Now, break the (truncated) document into three substrings:
+        #     [prefix] [masked_content] [suffix]
+        mean_len = round(len(document) / 4)
+        mask_len = mean_len + random.randint(-mean_len, mean_len)
+        clip_idx = random.randint(0, mask_len)
+
+        # prefix, suffix, mc
+        prefix = document[:clip_idx]
+        suffix = document[clip_idx + mask_len:]
+        masked_content = document[clip_idx:clip_idx + mask_len]
+
+        # 3. Rearrange these substrings into the following form:
+        #     [prefix] MASK_CHAR [suffix] MASK_CHAR [masked_content] [pads]
+        masked_string = prefix + self.MASK_CHAR + suffix + self.MASK_CHAR + masked_content
+        masked_string += self.PAD_CHAR * (self.block_size - len(masked_string))
+
+        # 4. We now use masked_string to construct the input and output example pair. To
+        # do so, simply take the input string to be masked_string[:-1], and the output
+        # string to be masked_string[1:]. In other words, for each character, the goal is
+        # to predict the next character in the masked string.
+        input = masked_string[:-1]
+        output = masked_string[1:]
+
+        # 5. Making use of the vocabulary that you defined, encode the resulting input
+        # and output strings as Long tensors and return the resulting data point.
+        x = torch.tensor([*map(self.stoi.get, input)], dtype=torch.long)
+        y = torch.tensor([*map(self.stoi.get, output)], dtype=torch.long)
+        return x,y
+
 
 """
 Code under here is strictly for your debugging purposes; feel free to modify
@@ -183,17 +218,17 @@ if __name__ == '__main__':
 
     if args.dataset_type == 'namedata':
         # Even if it hasn't been implemented, we use it to define the vocab
-        corruption_dataset = CharCorruptionDataset(open('wiki.txt').read(), 128) 
+        corruption_dataset = CharCorruptionDataset(open('wiki.txt', encoding='utf-8').read(), 128)
         # Make the name dataset
         name_dataset = NameDataset(corruption_dataset,
-            open('birth_places_train.tsv').read())
+            open('birth_places_train.tsv', encoding='utf-8').read())
         for _, example in zip(range(4), name_dataset):
             x, y = example
             print('x:', ''.join([name_dataset.itos[int(c)] for c in x]))
             print('y:', ''.join([name_dataset.itos[int(c)] for c in y]))
         pass
     elif args.dataset_type == 'charcorruption':
-        corruption_dataset = CharCorruptionDataset(open('wiki.txt').read(), 128) 
+        corruption_dataset = CharCorruptionDataset(open('wiki.txt', encoding='utf-8').read(), 128)
         for _, example in zip(range(4), corruption_dataset):
             x, y = example
             print('x:', ''.join([corruption_dataset.itos[int(c)] for c in x]))
